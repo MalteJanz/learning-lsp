@@ -1,0 +1,29 @@
+{
+  "name": "learning-lsp",
+  "description": "Just a learning project",
+  "author": "Malte Janz",
+  "license": "MIT",
+  "version": "0.1.0",
+  "publisher": "Malte Janz",
+  "categories": [],
+  "engines": {
+    "vscode": "^1.130.0"
+  },
+  "activationEvents": [
+    "onLanguage"
+  ],
+  "main": "./client/out/extension",
+  "contributes": {
+    "configuration": {}
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -b",
+    "watch": "tsc -b -w",
+    "postinstall": "cd client && npm install && cd ../server && go build . && cd .."
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.2",
+    "typescript": "^7.0.2"
+  }
+}

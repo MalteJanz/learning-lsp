@@ -1,0 +1,79 @@
+# Learning LSP
+
+Just a learning project to get familiar with the [LSP Specification](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.18/specification/)
+by building a very primitive LSP server from scratch in Golang.
+
+## Used learning ressources
+
+- Youtube: [LSP: Building a Language Server From Scratch](https://youtu.be/Xo5VXTRoL6Q) (in Typescript)
+  - GitHub: [Minimum Viable VS Code Language Server Extension](https://github.com/semanticart/minimum-viable-vscode-language-server-extension) where this Repo got its scaffolding code from, especially the VSCode client / extension and some further details below in this README on how to build / debug with VSCode.
+- Youtube: [Learn By Building: Language Server Protocol](https://youtu.be/YsdlcQoHqPY) (in Golang)
+  - GitHub: [educationalsp](https://github.com/tjdevries/educationalsp)
+
+## Getting Started
+
+1. Run `npm install` from the repo root.
+
+To make it easy to get started, this language server will run on _every_ file type by default. To target specific languages, change
+
+`package.json`'s `activationEvents` to something like
+
+```
+"activationEvents": [
+  "onLanguage:plaintext"
+],
+```
+
+And change the `documentSelector` in `client/src/extension.ts` to replace the `*` (e.g.)
+
+```
+documentSelector: [{ scheme: "file", language: "plaintext" }],
+```
+
+2. Inside the `./server` directory, run `go build .`
+
+## Developing your extension
+
+From the root directory of this project, run `code .` Then in VS Code
+
+1. Build the extension (both client and server) with `⌘+shift+B` (or `ctrl+shift+B` on windows)
+2. Open the Run and Debug view and press "Launch Client" (or press `F5`). This will open a `[Extension Development Host]` VS Code window.
+3. Opening or editing a file in that window should show an information message in VS Code like you see below.
+
+   ![example information message](https://semanticart.com/misc-images/minimum-viable-vscode-language-server-extension-info-message.png)
+
+4. Inspect the LSP server log under `/tmp/learning-lsp.log` by opening that file
+
+[Debugging instructions can be found here][debug]
+
+## Distributing your extension
+
+Read the full [Publishing Extensions doc][publish] for the full details.
+
+Note that you can package and distribute a standalone `.vsix` file without publishing it to the marketplace by following [these instructions][vsix].
+
+## Anatomy
+
+```
+.
+├── .vscode
+│   ├── launch.json         // Tells VS Code how to launch our extension
+│   └── tasks.json          // Tells VS Code how to build our extension
+├── LICENSE
+├── README.md
+├── client
+│   ├── package-lock.json   // Client dependencies lock file
+│   ├── package.json        // Client manifest
+│   ├── src
+│   │   └── extension.ts    // Code to tell VS Code how to run our language server
+│   └── tsconfig.json       // TypeScript config for the client
+├── package-lock.json       // Top-level Dependencies lock file
+├── package.json            // Top-level manifest
+├── server                  // Golang LSP written from scratch, the heart of this project
+└── tsconfig.json           // Top-level TypeScript config
+```
+
+[debug]: https://code.visualstudio.com/api/language-extensions/language-server-extension-guide#debugging-both-client-and-server
+[sample]: https://github.com/microsoft/vscode-extension-samples/tree/main/lsp-sample
+[publish]: https://code.visualstudio.com/api/working-with-extensions/publishing-extension
+[vsix]: https://code.visualstudio.com/api/working-with-extensions/publishing-extension#packaging-extensions
