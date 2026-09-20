@@ -3,6 +3,20 @@
 Just a learning project to get familiar with the [LSP Specification](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.18/specification/)
 by building a very primitive LSP server from scratch in Golang.
 
+## Goal
+
+To build towards a real use case this project tries to implement LSP functionality for administration snippets in [Shopware](https://github.com/shopware/shopware) projects.
+For now the following is implemented (with some ideas to explore further):
+- [x] when you open `snippet/en.json` / `snippet/de.json` file in your IDE these snippets get indexed (stored in a lookup table)
+- [x] when you have a `.twig` / `.js` / `.ts` file open and hover open a snippet key string, and if that is found in the index, it shows all known definitions and their values
+- [ ] index all snippet files in workspace root directory, not only opened / changed ones
+- [ ] autocomplete indexed snippet keys
+- [ ] instead of just json unmarshal build a lexer + parser for snippet definitions, properly extracting line + utf-16 character information for each snippet key
+- [ ] goto definitions based on the exact file + position information of each snippet key
+- [ ] goto references
+- [ ] diagnostics on missing keys for other languages (e.g. defined in 'en' but not in 'de')
+- [ ] diagnostics on key overrides for the same language (e.g. leaf defined in one file, overridden in another)
+
 ## Used learning ressources
 
 - Youtube: [LSP: Building a Language Server From Scratch](https://youtu.be/Xo5VXTRoL6Q) (in Typescript)

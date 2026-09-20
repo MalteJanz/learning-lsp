@@ -7,6 +7,7 @@ type InitializeRequest struct {
 
 type InitializeRequestParams struct {
 	ClientInfo *ClientInfo `json:"clientInfo"`
+	RootPath   string      `json:"rootPath"`
 	// ... there's tons more that goes here
 }
 
@@ -28,10 +29,7 @@ type InitializeResult struct {
 type ServerCapabilities struct {
 	TextDocumentSync int `json:"textDocumentSync"`
 
-	HoverProvider      bool           `json:"hoverProvider"`
-	DefinitionProvider bool           `json:"definitionProvider"`
-	CodeActionProvider bool           `json:"codeActionProvider"`
-	CompletionProvider map[string]any `json:"completionProvider"`
+	HoverProvider bool `json:"hoverProvider"`
 }
 
 type ServerInfo struct {
@@ -46,12 +44,7 @@ func NewInitializeResponse(id int) InitializeResponse {
 		Result: InitializeResult{
 			Capabilities: ServerCapabilities{
 				TextDocumentSync: 1, // Full: Documents are synced by always sending the full content of the document.
-				/*
-					HoverProvider:      true,
-					DefinitionProvider: true,
-					CodeActionProvider: true,
-					CompletionProvider: map[string]any{},
-				*/
+				HoverProvider:    true,
 			},
 			ServerInfo: ServerInfo{
 				Name:    "learning-lsp",

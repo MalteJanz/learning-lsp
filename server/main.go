@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"io"
+	"learning-lsp/analysis"
 	"learning-lsp/lsp"
 	"learning-lsp/rpc"
 	"log"
@@ -19,6 +20,8 @@ func main() {
 
 	writer := os.Stdout
 
+	state := analysis.NewState(logger)
+
 	for scanner.Scan() {
 		rawMsg := scanner.Bytes()
 		method, contents, err := rpc.DecodeMsg(rawMsg)
@@ -27,7 +30,7 @@ func main() {
 			continue
 		}
 
-		handleMsg(logger, writer, method, contents)
+		handleMsg(&state, writer, method, contents)
 	}
 
 	if err := scanner.Err(); err != nil {
@@ -35,7 +38,8 @@ func main() {
 	}
 }
 
-func handleMsg(logger *log.Logger, writer io.Writer, method string, contents []byte) {
+func handleMsg(state *analysis.State, writer io.Writer, method string, contents []byte) {
+	logger := state.Logger
 	logger.Printf("Received msg with method: %s", method)
 
 	switch method {
@@ -45,13 +49,17 @@ func handleMsg(logger *log.Logger, writer io.Writer, method string, contents []b
 			logger.Printf("Failed to parse intitialize: %s", err)
 		}
 
-		logger.Printf("LSP client %s %s connected", request.Params.ClientInfo.Name, request.Params.ClientInfo.Version)
+		logger.Printf(
+			"LSP client %s %s connected. workspace rootPath: %s",
+			request.Params.ClientInfo.Name,
+			request.Params.ClientInfo.Version,
+			request.Params.RootPath,
+		)
 
 		msg := lsp.NewInitializeResponse(request.ID)
-
 		SendMsg(logger, writer, msg)
-	case "initialized":
-		logger.Println("Initialization completed")
+
+		state.Initialize(request.Params.RootPath)
 	case "textDocument/didOpen":
 		var notification lsp.DidOpenTextDocumentNotification
 		if err := json.Unmarshal(contents, &notification); err != nil {
@@ -59,6 +67,29 @@ func handleMsg(logger *log.Logger, writer io.Writer, method string, contents []b
 		}
 
 		logger.Printf("Opened: %s", notification.Params.TextDocument.URI)
+		state.OpenDocument(notification.Params.TextDocument.URI, notification.Params.TextDocument.Text)
+	case "textDocument/didChange":
+		var notification lsp.TextDocumentDidChangeNotification
+		if err := json.Unmarshal(contents, &notification); err != nil {
+			logger.Printf("Failed to parse textDocument/didChange: %s", err)
+		}
+
+		logger.Printf("Changed: %s", notification.Params.TextDocument.URI)
+		state.UpdateDocument(notification.Params.TextDocument.URI, notification.Params.ContentChanges[len(notification.Params.ContentChanges)-1].Text)
+	case "textDocument/hover":
+		var request lsp.HoverRequest
+		if err := json.Unmarshal(contents, &request); err != nil {
+			logger.Printf("Failed to parse textDocument/hover: %s", err)
+		}
+
+		logger.Printf("Hover: %s %v", request.Params.TextDocument.URI, request.Params.Position)
+
+		msg := lsp.HoverResponse{
+			RPC:    "2.0",
+			ID:     &request.ID,
+			Result: state.Hover(request),
+		}
+		SendMsg(logger, writer, msg)
 	}
 }
 
