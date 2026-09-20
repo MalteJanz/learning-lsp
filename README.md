@@ -23,6 +23,9 @@ For now the following is implemented (with some ideas to explore further):
   - GitHub: [Minimum Viable VS Code Language Server Extension](https://github.com/semanticart/minimum-viable-vscode-language-server-extension) where this Repo got its scaffolding code from, especially the VSCode client / extension and some further details below in this README on how to build / debug with VSCode.
 - Youtube: [Learn By Building: Language Server Protocol](https://youtu.be/YsdlcQoHqPY) (in Golang)
   - GitHub: [educationalsp](https://github.com/tjdevries/educationalsp)
+- Blog: [Why building a Rust LSP is hard](https://rust-glancer.github.io/blog/why-lsp-is-hard/)
+  - Interesting blog post which contains many useful links
+- Also worth exploring all the great blog posts from [matklad](https://matklad.github.io/) / [rust-analyzer](https://rust-analyzer.github.io/blog) about parsing and LSP topics
 
 ## Getting Started
 
